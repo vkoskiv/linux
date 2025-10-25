@@ -114,10 +114,11 @@ static inline dma_addr_t dma_direct_map_phys(struct device *dev,
 	return dma_addr;
 
 err_overflow:
-	dev_WARN_ONCE(
-		dev, 1,
-		"DMA addr %pad+%zu overflow (mask %llx, bus limit %llx).\n",
-		&dma_addr, size, *dev->dma_mask, dev->bus_dma_limit);
+	if (!(attrs & DMA_ATTR_NO_WARN))
+		dev_WARN_ONCE(
+			dev, 1,
+			"DMA addr %pad+%zu overflow (mask %llx, bus limit %llx).\n",
+			&dma_addr, size, *dev->dma_mask, dev->bus_dma_limit);
 	return DMA_MAPPING_ERROR;
 }
 
