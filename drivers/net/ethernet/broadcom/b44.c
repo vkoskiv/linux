@@ -649,9 +649,9 @@ static int b44_alloc_rx_skb(struct b44 *bp, int src_idx, u32 dest_idx_unmasked)
 	if (skb == NULL)
 		return -ENOMEM;
 
-	mapping = dma_map_single(bp->sdev->dma_dev, skb->data,
-				 RX_PKT_BUF_SZ,
-				 DMA_FROM_DEVICE);
+	mapping = dma_map_single_attrs(bp->sdev->dma_dev, skb->data,
+				       RX_PKT_BUF_SZ,
+				       DMA_FROM_DEVICE, DMA_ATTR_NO_WARN);
 
 	/* Hardware bug work-around, the chip is unable to do PCI DMA
 	   to/from anything above 1GB :-( */
@@ -963,7 +963,7 @@ static netdev_tx_t b44_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		goto err_out;
 	}
 
-	mapping = dma_map_single(bp->sdev->dma_dev, skb->data, len, DMA_TO_DEVICE);
+	mapping = dma_map_single_attrs(bp->sdev->dma_dev, skb->data, len, DMA_TO_DEVICE, DMA_ATTR_NO_WARN);
 	if (dma_mapping_error(bp->sdev->dma_dev, mapping) || mapping + len > DMA_BIT_MASK(30)) {
 		struct sk_buff *bounce_skb;
 
